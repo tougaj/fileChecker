@@ -104,4 +104,5 @@ dist
 .tern-port
 
 package-lock.json
-data/
+data/*.txt
+data/*.old
