@@ -56,14 +56,25 @@ const getChecksum = (fileName) =>
  * @param {string[]} fileList массив путей к файлам
  * @returns промис, разрешающийся массивом типа [fileName, checksum, fileSize][]
  */
-const generateChecksumForList = async (fileList) => {
+const generateChecksumForList = async (fileList, showNotExists = true) => {
 	const checksumList = [];
+	const notExistsList = [];
 	for (const fileName of fileList) {
+		if (!fs.existsSync(fileName)) {
+			notExistsList.push(fileName);
+			continue;
+		}
 		const fileSize = getFileSize(fileName);
 		const checksum = await getChecksum(fileName);
 		console.log(`Generated ${processedFileColor(fileName)}\n#${checksum}\tsize: ${fileSize} b\n`);
 		checksumList.push([fileName, checksum, fileSize]);
 	}
+	if (showNotExists && notExistsList.length !== 0)
+		console.log(
+			`${errorColor('ERROR: The following files are not listed on your computer:')}\n${chalk.red(
+				notExistsList.join('\n')
+			)}\n`
+		);
 	return checksumList;
 };
 
