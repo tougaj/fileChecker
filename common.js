@@ -35,9 +35,9 @@ const loadFileList = (fileName) =>
 /**
  * Рассчитывает размер файла
  * @param {string} fileName имя файла
- * @returns размер файла в байтах
+ * @returns строка размера файла в байтах
  */
-const getFileSize = (fileName) => fs.statSync(fileName).size;
+const getFileSize = (fileName) => fs.statSync(fileName).size.toString();
 
 /**
  * Рассчитывает контрольную сумму md5 файла
@@ -52,11 +52,25 @@ const getChecksum = (fileName) =>
 	});
 
 /**
+ * Выводит текст ошибки со списком элементов
+ * @param {string[]} fileList список элементов для вывода
+ * @param {string} errorMessage сообщение об ошибке
+ */
+const printListError = (fileList, errorMessage = '') => {
+	console.log(
+		`${errorFilesColor(`ERROR: ${errorMessage} (${fileList.length}):`)}\n${chalk.keyword('orange')(
+			fileList.map((text, index) => `${index + 1}. ${text}`).join('\n')
+		)}\n`
+	);
+};
+
+/**
  * Рассчитывает контрольные суммы списка файлов
  * @param {string[]} fileList массив путей к файлам
+ * @param {boolean} verbose выводить ли уведомления
  * @returns промис, разрешающийся массивом типа [fileName, checksum, fileSize][]
  */
-const generateChecksumForList = async (fileList, showNotExists = true) => {
+const generateChecksumForList = async (fileList, verbose = true) => {
 	const checksumList = [];
 	const notExistsList = [];
 	for (const fileName of fileList) {
@@ -66,21 +80,35 @@ const generateChecksumForList = async (fileList, showNotExists = true) => {
 		}
 		const fileSize = getFileSize(fileName);
 		const checksum = await getChecksum(fileName);
-		console.log(`Generated ${processedFileColor(fileName)}\n#${checksum}\tsize: ${fileSize} b\n`);
+		if (verbose) console.log(`Generated ${processedFileColor(fileName)}\n#${checksum}\tsize: ${fileSize} b\n`);
 		checksumList.push([fileName, checksum, fileSize]);
 	}
-	if (showNotExists && notExistsList.length !== 0)
-		console.log(
-			`${errorColor('ERROR: The following files are not listed on your computer:')}\n${chalk.red(
-				notExistsList.join('\n')
-			)}\n`
-		);
+	if (verbose && notExistsList.length !== 0)
+		printListError(notExistsList, "Файли, наявні у списку, але відсутні на комп'ютері");
 	return checksumList;
 };
 
-const fileColor = chalk.green;
+/**
+ * Возвращает множество, содержащие элементы, входящие в fromSet и не входящие в toSet
+ * @param {Set} fromSet исходное множество
+ * @param {Set} toSet конечное множество
+ * @returns разница между множествами
+ */
+const getSetDifference = (fromSet, toSet) => new Set([...fromSet].filter((x) => !toSet.has(x)));
+
+/**
+ * Возвращает множество, содержащие элементы, входящие и в fromSet и в toSet
+ * @param {Set} fromSet исходное множество
+ * @param {Set} toSet конечное множество
+ * @returns пересечение множеств
+ */
+const getSetIntersection = (fromSet, toSet) => new Set([...fromSet].filter((x) => toSet.has(x)));
+
+const fileColor = chalk.yellow;
 const processedFileColor = chalk.gray;
-const errorColor = chalk.yellow.bgRed.bold;
+const errorFilesColor = chalk.yellow.bgRed.bold;
+const successColor = chalk.green;
+const errorColor = errorFilesColor;
 const infoColor = chalk.cyan;
 
 module.exports = {
@@ -90,4 +118,9 @@ module.exports = {
 	loadFileList,
 	generateChecksumForList,
 	fileColor,
+	successColor,
+	errorColor,
+	getSetDifference,
+	getSetIntersection,
+	printListError,
 };

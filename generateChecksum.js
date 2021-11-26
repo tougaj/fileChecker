@@ -9,7 +9,7 @@ console.log(`The list of files is ${fileColor(fileListFileName)}\n`);
  * Если файл с именем fileName уже существует, то перед записью контрольных сумм
  * переименовывает этот файл.
  * @param {string} fileName имя файла, в который будут записаны контрольные суммы
- * @param {[string, string, number][]} checksumList массив контрольных сумм файлов типа [fileName, checksum, fileSize][]
+ * @param {[string, string, string][]} checksumList массив контрольных сумм файлов типа [fileName, checksum, fileSize][]
  */
 const saveChecksum = (fileName, checksumList) => {
 	if (fs.existsSync(fileName)) fs.renameSync(fileName, `${fileName}_${new Date().valueOf()}.old`);
