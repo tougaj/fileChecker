@@ -20,18 +20,6 @@ const loadFileList = (fileName) =>
 		.filter(Boolean)
 		.sort();
 
-// const getFileSize = (fileName) => {
-// 	let fileSize = NaN;
-// 	try {
-// 		const stats = fs.statSync(fileName);
-// 		fileSize = stats.size;
-// 	} catch (error) {
-// 		console.error(error);
-// 	}
-// 	return fileSize;
-// };
-
-// Пока решил, что при ошибках скрипт будет просто вываливаться с ошибкой.
 /**
  * Рассчитывает размер файла
  * @param {string} fileName имя файла
@@ -68,7 +56,7 @@ const printListError = (fileList, errorMessage = '') => {
  * Рассчитывает контрольные суммы списка файлов
  * @param {string[]} fileList массив путей к файлам
  * @param {boolean} verbose выводить ли уведомления
- * @returns промис, разрешающийся массивом типа [fileName, checksum, fileSize][]
+ * @returns промис, разрешающийся массивом вида [fileName, checksum, fileSize][]
  */
 const generateChecksumForList = async (fileList, verbose = true) => {
 	const checksumList = [];
