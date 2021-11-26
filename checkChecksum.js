@@ -102,4 +102,6 @@ const checkChecksumChanged = (modelChecksumList, checksumList) => {
 	if (errorCount === 0)
 		console.log(successColor('Перевірка контрольних сум успішно виконана. Розбіжностей між файлами не виявлено.'));
 	else console.log(errorColor(`Перевірка виконана. Кількість виявлених помилок: ${errorCount}`));
+
+	process.exitCode = errorCount;
 })();
