@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const md5 = require('md5');
+const chalk = require('chalk');
 
 const DATA_PATH = './data';
 const fileListFileName = path.resolve(DATA_PATH, 'filesForCheck.txt');
@@ -29,8 +30,8 @@ const loadFileList = (fileName) =>
 // 	}
 // 	return fileSize;
 // };
-// Пока решил, что при ошибках скрипт будет просто вываливаться с ошибкой.
 
+// Пока решил, что при ошибках скрипт будет просто вываливаться с ошибкой.
 /**
  * Рассчитывает размер файла
  * @param {string} fileName имя файла
@@ -60,11 +61,16 @@ const generateChecksumForList = async (fileList) => {
 	for (const fileName of fileList) {
 		const fileSize = getFileSize(fileName);
 		const checksum = await getChecksum(fileName);
-		console.log(`Generated checksums for the file "${fileName}"\t${checksum}\t${fileSize}`);
+		console.log(`Generated ${processedFileColor(fileName)}\n#${checksum}\tsize: ${fileSize} b\n`);
 		checksumList.push([fileName, checksum, fileSize]);
 	}
 	return checksumList;
 };
+
+const fileColor = chalk.green;
+const processedFileColor = chalk.gray;
+const errorColor = chalk.yellow.bgRed.bold;
+const infoColor = chalk.cyan;
 
 module.exports = {
 	DATA_PATH,
@@ -72,4 +78,5 @@ module.exports = {
 	checksumFileName,
 	loadFileList,
 	generateChecksumForList,
+	fileColor,
 };

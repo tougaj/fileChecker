@@ -1,20 +1,18 @@
 const fs = require('fs');
-const path = require('path');
-const { fileListFileName, checksumFileName, DATA_PATH, loadFileList, generateChecksumForList } = require('./common');
+const { fileListFileName, checksumFileName, loadFileList, generateChecksumForList, fileColor } = require('./common');
 
-console.log('File checksum generation program.');
-console.log(`The list of files is downloaded from the file "${fileListFileName}"\n`);
+console.log('File checksum generation program.\n');
+console.log(`The list of files is ${fileColor(fileListFileName)}\n`);
 
 /**
  * Записывает контрольные суммы в файл в формате "fileName\tchecksum\tfileSize\n".
  * Если файл с именем fileName уже существует, то перед записью контрольных сумм
  * переименовывает этот файл.
  * @param {string} fileName имя файла, в который будут записаны контрольные суммы
- * @param {*} checksumList массив контрольных сумм файлов типа [fileName, checksum, fileSize][]
+ * @param {[string, string, number][]} checksumList массив контрольных сумм файлов типа [fileName, checksum, fileSize][]
  */
 const saveChecksum = (fileName, checksumList) => {
-	if (fs.existsSync(fileName))
-		fs.renameSync(fileName, path.resolve(DATA_PATH, `checksum_${new Date().valueOf()}.old`));
+	if (fs.existsSync(fileName)) fs.renameSync(fileName, `${fileName}_${new Date().valueOf()}.old`);
 	fs.writeFileSync(fileName, checksumList.map((item) => item.join('\t')).join('\n'));
 };
 
@@ -23,5 +21,5 @@ const saveChecksum = (fileName, checksumList) => {
 	const checksumList = await generateChecksumForList(fileList);
 	saveChecksum(checksumFileName, checksumList);
 
-	console.log(`\nThe file list checksums are calculated and written to the file "${checksumFileName}"`);
+	console.log(`The file list checksums are calculated and written to the file ${fileColor(checksumFileName)}`);
 })();
